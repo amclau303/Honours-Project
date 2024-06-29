@@ -145,3 +145,50 @@ def line_chart(request):
 
     context = {'line_chart': line_chart}
     return render(request, 'line_chart.html', context)
+
+def scatter_plot(request):
+    thyroid = Thyroid.objects.all()
+
+    # Convert to DataFrame
+    df = pd.DataFrame(thyroid.values())
+
+    # Filter for 'yes' thyroid_status
+    df_filtered = df[df['thyroid_status'] == 'yes']
+
+    # Group by year and gender and count occurrences
+    df_grouped = df_filtered.groupby(['year', 'gender']).size().reset_index(name='count')
+
+    # Separate the data for male and female
+    df_male = df_grouped[df_grouped['gender'] == 'male']
+    df_female = df_grouped[df_grouped['gender'] == 'female']
+
+    # Create scatter plot
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=df_male['year'], 
+        y=df_male['count'],
+        mode='markers',
+        name='Male',
+        marker=dict(color='blue')
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=df_female['year'], 
+        y=df_female['count'],
+        mode='markers',
+        name='Female',
+        marker=dict(color='pink')
+    ))
+
+    fig.update_layout(
+        title="Scatter Plot of Thyroid Status 'Yes' by Gender",
+        xaxis_title="Year",
+        yaxis_title="Count",
+        template='plotly_white'
+    )
+
+    scatter_plot_html = fig.to_html(full_html=False)
+
+    context = {'scatter_plot': scatter_plot_html}
+    return render(request, 'scatter_plot.html', context)
