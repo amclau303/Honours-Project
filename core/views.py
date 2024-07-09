@@ -229,8 +229,11 @@ def stacked_bar_chart(request):
     # Convert QuerySet to DataFrame
     df = pd.DataFrame(list(thyroid_data.values('year', 'gender', 'treatment_status', 'thyroid_status')))
 
+    # Filter data for 'yes' thyroid_status and 'yes' treatment_status
+    df_filtered = df[(df['thyroid_status'] == 'yes') | (df['treatment_status'] == 'yes')]
+
     # Group by year and gender, count occurrences for each status
-    df_grouped = df.groupby(['year', 'gender']).agg({
+    df_grouped = df_filtered.groupby(['year', 'gender']).agg({
         'treatment_status': lambda x: (x == 'yes').sum(),
         'thyroid_status': lambda x: (x == 'yes').sum()
     }).reset_index()
@@ -242,26 +245,35 @@ def stacked_bar_chart(request):
     fig = go.Figure()
 
     # Add traces for treatment_status
-    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['treatment_status']['male'], name='Male - Treatment',
+    fig.add_trace(go.Bar(x=df_pivot.index.astype(str), y=df_pivot['treatment_status']['male'], name='Male - Treated',
                          marker_color='#1f77b4'))
-    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['treatment_status']['female'], name='Female - Treatment',
-                         marker_color='#ff7f0e', opacity=0.7))
+    fig.add_trace(go.Bar(x=df_pivot.index.astype(str), y=df_pivot['treatment_status']['female'], name='Female - Treated',
+                         marker_color='#ff7f0e'))
 
     # Add traces for thyroid_status
-    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['thyroid_status']['male'], name='Male - Thyroid',
+    fig.add_trace(go.Bar(x=df_pivot.index.astype(str), y=df_pivot['thyroid_status']['male'], name='Male - Thyroid Disease',
                          marker_color='#2ca02c'))
-    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['thyroid_status']['female'], name='Female - Thyroid',
-                         marker_color='#d62728', opacity=0.7))
+    fig.add_trace(go.Bar(x=df_pivot.index.astype(str), y=df_pivot['thyroid_status']['female'], name='Female - Thyroid Disease',
+                         marker_color='#d62728'))
 
     # Update layout
     fig.update_layout(
         barmode='stack',
-        title='Thyroid Disorder and Treatment Status by Gender',
-        xaxis_title='Year',
+        xaxis=dict(
+            title='Year',
+            tickmode='linear',
+            tick0=df_pivot.index.min(),
+            dtick=1,
+            tickangle=-45,
+            tickformat='%Y',  # Format as year
+            showgrid=True,
+            gridcolor='lightgray',
+        ),
         yaxis_title='Count',
         legend=dict(x=0.01, y=0.99),
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(t=50, l=10, r=10, b=10),
+        title='Thyroid Disorder and Treatment Status by Gender',
+        margin=dict(t=50, l=10, r=10, b=70),  # Increased bottom margin for x-axis labels
     )
 
     # Convert figure to HTML
