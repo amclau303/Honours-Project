@@ -2,19 +2,27 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1, shrink-to-fit=no"
-		/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 		<title>Bootstrap Dashboard</title>
 		<!-- Bootstrap CSS -->
-		<link
-			href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-			rel="stylesheet"
-		/>
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 		<style>
 			body {
 				font-size: 0.875rem;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				background-color: #f8f9fa;
+			}
+
+			.navbar {
+				justify-content: center;
+				background-color: #343a40 !important;
+			}
+
+			.navbar-brand {
+				padding: 0.75rem 1rem;
+				font-size: 1.5rem;
+				font-weight: bold;
+				color: #ffffff !important;
 			}
 
 			.sidebar {
@@ -24,6 +32,8 @@
 				left: 0;
 				z-index: 100;
 				padding: 48px 0 0;
+				background-color: #343a40;
+				color: #ffffff;
 			}
 
 			.sidebar-sticky {
@@ -35,57 +45,83 @@
 				overflow-y: auto;
 			}
 
-			.navbar-brand {
-				padding: 0.75rem 1rem;
-			}
-
-			.navbar {
-				justify-content: center;
-			}
-
 			.nav-link {
 				font-size: 1.25rem;
+				color: #ffffff !important;
+				padding: 10px 20px;
+			}
+
+			.nav-link:hover {
+				background-color: #495057;
+				color: #ffffff !important;
+				text-decoration: none;
+			}
+
+			.nav-link.active {
+				background-color: #007bff;
+				color: #ffffff !important;
 			}
 
 			.nav-link:not(:last-child) {
-				border-bottom: 1px solid #ddd;
+				border-bottom: 1px solid #495057;
+			}
+
+			.main-content {
+				padding: 20px;
+				background-color: #ffffff;
+				margin-top: 20px;
+				border-radius: 8px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.table-responsive {
+				margin-top: 20px;
+			}
+
+			h2 {
+				margin-top: 20px;
+			}
+
+			.block-content {
+				padding: 20px;
+				background-color: #ffffff;
+				border-radius: 8px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				margin-bottom: 20px;
 			}
 		</style>
 	</head>
 	<body>
-		<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+		<nav class="navbar navbar-dark sticky-top flex-md-nowrap p-0">
 			<a class="navbar-brand mx-auto" href="/">Thyroid Data Visualization Application</a>
 		</nav>
 
 		<div class="container-fluid">
 			<div class="row">
-				<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+				<nav class="col-md-2 d-none d-md-block sidebar">
 					<div class="sidebar-sticky">
 						<ul class="nav flex-column">
 							<li class="nav-item">
-								<a class="nav-link active" href="/"> Index </a>
+								<a class="nav-link active" href="/">Index</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="/line_chart"> Line </a>
+								<a class="nav-link" href="/line_chart">Line</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" href="/scatter_plot"> Scatter </a>
+								<a class="nav-link" href="/scatter_plot">Scatter</a>
 							</li>
 						</ul>
 					</div>
 				</nav>
 
 				<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-					<div
-						class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-					>
+					<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom main-content">
 						<h1 class="h2">Dashboard</h1>
 					</div>
 
-					{% block content %} {% endblock content %}
-
-					<h2>Section title</h2>
-					<div class="table-responsive"></div>
+					<div class="block-content">
+						{% block content %} {% endblock content %}
+					</div>
 				</main>
 			</div>
 		</div>
