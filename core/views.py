@@ -5,7 +5,15 @@ from thyroid.models import Thyroid
 import pandas as pd
 import plotly.graph_objects as go
 
-def chart(request):
+def index(request):
+
+    context = {
+        'message': 'Hello'
+    }
+
+    return render(request, 'index.html', context)
+
+def bar_chart(request):
     # Define the years for the slide
     years = [2005, 2006, 2015, 2016, 2019, 2020, 2021]
     
@@ -51,10 +59,8 @@ def chart(request):
         font=dict(
             family="Arial, sans-serif",
             size=12,
-            color="RebeccaPurple"
         ),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        plot_bgcolor='rgba(0,0,0,0)'
     )
     
     # Add custom hover information
@@ -67,108 +73,99 @@ def chart(request):
 
     # Pass the chart to the template
     context = {'chart': chart}
-    return render(request, 'chart.html', context)
+    return render(request, 'bar_chart.html', context)
 
 def line_chart(request):
     thyroid = Thyroid.objects.all()
 
-    # Convert QuerySet to list of dictionaries
-    thyroid_list = list(thyroid.values('year', 'gender', 'treatment_status', 'thyroid_status'))
+    # Convert QuerySet to DataFrame
+    df = pd.DataFrame(list(thyroid.values('year', 'gender', 'treatment_status', 'thyroid_status')))
 
-    # Create DataFrame
-    df = pd.DataFrame(thyroid_list)
+    # Filter data for 'yes' thyroid_status and 'yes' treatment_status
+    df_filtered = df[(df['thyroid_status'] == 'yes') | (df['treatment_status'] == 'yes')]
 
-    # Filter data for males with 'yes' as thyroid_status
-    df_filtered_thyroid_status = df[(df['year'] != 2005) & (df['year'] != 2006) & (df['thyroid_status'] == 'yes')]
-
-    # Group by year and count occurrences for thyroid_status
-    df_grouped_thyroid_status = df_filtered_thyroid_status.groupby('year').size().reset_index(name='count')
-
-    # Filter data for people with 'yes' as treatment_status
-    df_filtered_treatment_status = df[df['treatment_status'] == 'yes']
-
-    # Group by year and count occurrences for treatment_status
-    df_grouped_treatment_status = df_filtered_treatment_status.groupby('year').size().reset_index(name='count')
+    # Group by year and count occurrences for both statuses
+    df_grouped = df_filtered.groupby('year').agg({
+        'thyroid_status': lambda x: (x == 'yes').sum(),
+        'treatment_status': lambda x: (x == 'yes').sum()
+    }).reset_index()
 
     # Initialize figure
     fig = go.Figure()
 
-    # Add trace for males with 'yes' thyroid status
-    fig.add_trace(go.Scatter(x=df_grouped_thyroid_status['year'], y=df_grouped_thyroid_status['count'], mode='lines+markers', name='Amount of people with Thyroid Disorder', line=dict(color="#33CFA5")))
+    # Add trace for 'yes' thyroid status
+    fig.add_trace(go.Scatter(x=df_grouped['year'], y=df_grouped['thyroid_status'], mode='lines+markers', 
+                             name='Thyroid Disorder', line=dict(color="#33CFA5")))
 
-    # Add trace for people with 'yes' treatment status
-    fig.add_trace(go.Scatter(x=df_grouped_treatment_status['year'], y=df_grouped_treatment_status['count'], mode='lines+markers', name='Amount of people with Thyroid Disorder who sought treatment', line=dict(color="#F06A6A")))
+    # Add trace for 'yes' treatment status
+    fig.add_trace(go.Scatter(x=df_grouped['year'], y=df_grouped['treatment_status'], mode='lines+markers', 
+                             name='Thyroid Disorder with Treatment', line=dict(color="#F06A6A")))
 
-    # Annotations for the highest values
-    max_thyroid_status = df_grouped_thyroid_status[df_grouped_thyroid_status['count'] == df_grouped_thyroid_status['count'].max()]
-    max_treatment_status = df_grouped_treatment_status[df_grouped_treatment_status['count'] == df_grouped_treatment_status['count'].max()]
-
+    # Annotations for Thyroid Disorder trace
+    max_thyroid_year = df_grouped.loc[df_grouped['thyroid_status'].idxmax(), 'year']
     max_thyroid_annotation = [
         dict(
-            x=max_thyroid_status['year'].values[0],
-            y=max_thyroid_status['count'].values[0],
+            x=max_thyroid_year,
+            y=df_grouped.loc[df_grouped['year'] == max_thyroid_year, 'thyroid_status'].values[0],
             xref="x",
             yref="y",
-            text=f"Max Thyroid Status: {max_thyroid_status['count'].values[0]}",
-            showarrow=True,
-            arrowhead=7,
-            ax=50,
-            ay=-40
+            text=f'Max Thyroid Disorder: {df_grouped["thyroid_status"].max()}',
+            showarrow=True, arrowhead=7, ax=50, ay=-40
         )
     ]
 
+    # Annotations for Thyroid Disorder with Treatment trace
+    max_treatment_year = df_grouped.loc[df_grouped['treatment_status'].idxmax(), 'year']
     max_treatment_annotation = [
         dict(
-            x=max_treatment_status['year'].values[0],
-            y=max_treatment_status['count'].values[0],
+            x=max_treatment_year,
+            y=df_grouped.loc[df_grouped['year'] == max_treatment_year, 'treatment_status'].values[0],
             xref="x",
             yref="y",
-            text=f"Max Treatment Status: {max_treatment_status['count'].values[0]}",
-            showarrow=True,
-            arrowhead=7,
-            ax=-50,
-            ay=70
+            text=f'Max Treatment: {df_grouped["treatment_status"].max()}',
+            showarrow=True, arrowhead=7, ax=-50, ay=70
         )
     ]
 
-    # Update layout with annotations
+    # Add annotations to the figure
     fig.update_layout(
-        title="",
+        annotations=max_thyroid_annotation + max_treatment_annotation
+    )
+
+    # Update layout
+    fig.update_layout(
+        title="Thyroid Disorder Analysis",
         xaxis_title="Year",
         yaxis_title="Count",
-        updatemenus =[
+        legend=dict(x=0.01, y=0.99),
+        plot_bgcolor='rgba(0,0,0,0)',
+        updatemenus=[
             dict(
-                active=0,
+                type="buttons",
+                direction="down",
                 buttons=list([
-                    dict(
-                        label="None",
-                        method="update",
-                        args=[{"visible": [True, True]},
-                              {"title": "Thyroid Status",
-                               "annotations": []}]
-                    ),
-                    dict(
-                        label="Both",
-                        method="update",
-                        args=[{"visible": [True, True]},
-                              {"title": "Thyroid/Treatment with Max Values",
-                               "annotations": max_treatment_annotation + max_thyroid_annotation}]
-                    ),
-                    dict(
-                        label="Thyroid",
-                        method="update",
-                        args=[{"visible": [True, False]},
-                              {"title": "Thyroid Disorder Amounts",
-                               "annotations": max_thyroid_annotation}]
-                    ),
-                    dict(
-                        label="Treatment",
-                        method="update",
-                        args=[{"visible": [False, True]},
-                              {"title": "Treatment Amounts",
-                               "annotations": max_treatment_annotation}]
-                    ),
-                ])
+                    dict(label="Reset",
+                         method="update",
+                         args=[{"visible": [True, True]},
+                               {"title": "Thyroid Disorder Analysis",
+                                "annotations": max_thyroid_annotation + max_treatment_annotation}]),
+                    dict(label="Max Values",
+                         method="update",
+                         args=[{"visible": [True, True]},
+                               {"title": "Thyroid/Treatment with Max Values",
+                                "annotations": max_thyroid_annotation + max_treatment_annotation}]),
+                    dict(label="Thyroid Only",
+                         method="update",
+                         args=[{"visible": [True, False]},
+                               {"title": "Thyroid Disorder Analysis",
+                                "annotations": max_thyroid_annotation}]),
+                    dict(label="Treatment Only",
+                         method="update",
+                         args=[{"visible": [False, True]},
+                               {"title": "Thyroid Disorder with Treatment Analysis",
+                                "annotations": max_treatment_annotation}]),
+                ]),
+                showactive=True,
             )
         ]
     )
@@ -225,3 +222,50 @@ def scatter_plot(request):
 
     context = {'scatter_plot': scatter_plot_html}
     return render(request, 'scatter_plot.html', context)
+
+def stacked_bar_chart(request):
+    thyroid_data = Thyroid.objects.all()
+
+    # Convert QuerySet to DataFrame
+    df = pd.DataFrame(list(thyroid_data.values('year', 'gender', 'treatment_status', 'thyroid_status')))
+
+    # Group by year and gender, count occurrences for each status
+    df_grouped = df.groupby(['year', 'gender']).agg({
+        'treatment_status': lambda x: (x == 'yes').sum(),
+        'thyroid_status': lambda x: (x == 'yes').sum()
+    }).reset_index()
+
+    # Pivot the DataFrame for easier plotting
+    df_pivot = df_grouped.pivot(index='year', columns='gender', values=['treatment_status', 'thyroid_status']).fillna(0)
+
+    # Plotting the stacked bar chart
+    fig = go.Figure()
+
+    # Add traces for treatment_status
+    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['treatment_status']['male'], name='Male - Treatment',
+                         marker_color='#1f77b4'))
+    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['treatment_status']['female'], name='Female - Treatment',
+                         marker_color='#ff7f0e', opacity=0.7))
+
+    # Add traces for thyroid_status
+    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['thyroid_status']['male'], name='Male - Thyroid',
+                         marker_color='#2ca02c'))
+    fig.add_trace(go.Bar(x=df_pivot.index, y=df_pivot['thyroid_status']['female'], name='Female - Thyroid',
+                         marker_color='#d62728', opacity=0.7))
+
+    # Update layout
+    fig.update_layout(
+        barmode='stack',
+        title='Thyroid Disorder and Treatment Status by Gender',
+        xaxis_title='Year',
+        yaxis_title='Count',
+        legend=dict(x=0.01, y=0.99),
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(t=50, l=10, r=10, b=10),
+    )
+
+    # Convert figure to HTML
+    stacked_bar_chart = fig.to_html()
+
+    context = {'stacked_bar_chart': stacked_bar_chart}
+    return render(request, 'stacked_bar_chart.html', context)
