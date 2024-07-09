@@ -24,10 +24,43 @@ def chart(request):
     # Convert data to pandas DataFrame
     df = pd.DataFrame(data)
     
-    # Create the animated bar chart
-    fig = px.bar(df[df['status_type'] == 'thyroid'], x='status', y='count', animation_frame='year', range_y=[0, df['count'].max()],
-                 labels={'status': 'Thyroid Status', 'count': 'Count'},
-                 title='Thyroid Status Counts by Year')   
+    # Create the animated bar chart with enhancements
+    fig = px.bar(
+        df[df['status_type'] == 'thyroid'],
+        x='status',
+        y='count',
+        color='status',
+        animation_frame='year',
+        range_y=[0, df['count'].max()],
+        labels={'status': 'Thyroid Status', 'count': 'Count'},
+        title='Thyroid Status Counts by Year'
+    )
+    
+    # Update layout for better aesthetics
+    fig.update_layout(
+        title={
+            'text': 'Thyroid Status Counts by Year',
+            'y':0.9,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'
+        },
+        xaxis_title='Thyroid Status',
+        yaxis_title='Count',
+        legend_title='Thyroid Status',
+        font=dict(
+            family="Arial, sans-serif",
+            size=12,
+            color="RebeccaPurple"
+        ),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
+    )
+    
+    # Add custom hover information
+    fig.update_traces(
+        hovertemplate='<b>Status:</b> %{x}<br><b>Count:</b> %{y}<br><b>Year:</b> %{frame}'
+    )
 
     # Convert the chart to HTML
     chart = fig.to_html(full_html=False)
