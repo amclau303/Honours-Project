@@ -25,4 +25,5 @@ urlpatterns = [
     path('line_chart', views.line_chart, name='line_chart'),
     path('scatter_plot', views.scatter_plot, name='scatter_plot'),
     path('stacked_bar_chart', views.stacked_bar_chart, name='stacked_bar_chart'),
+    path('thyroid_map', views.thyroid_map_view, name='thyroid_map')
 ]

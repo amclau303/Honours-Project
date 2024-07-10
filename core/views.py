@@ -2,6 +2,7 @@ from django.shortcuts import render
 import plotly.express as px
 from django.db.models import Count
 from thyroid.models import Thyroid
+from thyroid.models import Location
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -281,3 +282,39 @@ def stacked_bar_chart(request):
 
     context = {'stacked_bar_chart': stacked_bar_chart}
     return render(request, 'stacked_bar_chart.html', context)
+
+def thyroid_map_view(request):
+        
+    # Fetch all locations from the database
+    locations = Location.objects.all()
+
+    # Filter out locations where latitude or longitude is 0
+    filtered_locations = [loc for loc in locations if loc.latnum != 0 and loc.longnum != 0]
+    
+    # Create a DataFrame from the fetched data
+    data = {
+        'Latitude': [loc.latnum for loc in filtered_locations],
+        'Longitude': [loc.longnum for loc in filtered_locations]
+    }
+    df = pd.DataFrame(data)
+    
+    # Generate the Plotly heatmap with a less intense color scale
+    fig = px.density_mapbox(
+        df, lat='Latitude', lon='Longitude', radius=10,
+        mapbox_style='open-street-map',
+        title='Thyroid Locations Heatmap',
+        height=1000,  # Increase the height of the map
+        color_continuous_scale="Viridis"  # Adjust color scale to be less intense
+    )
+    
+    # Set the opacity of the heatmap
+    fig.update_traces(opacity=0.6)  # Adjust the opacity to make the colors less intense
+    
+    # Set the map's center and zoom level
+    fig.update_layout(mapbox=dict(center=dict(lat=df['Latitude'].mean(), lon=df['Longitude'].mean()), zoom=4.5))
+    
+    # Convert the Plotly figure to HTML
+    plot_div = fig.to_html(full_html=False)
+    
+    # Render the template with the Plotly map
+    return render(request, 'thyroid_map.html', {'plot_div': plot_div})
