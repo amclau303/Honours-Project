@@ -26,3 +26,10 @@ class Thyroid(models.Model):
     
     def __str__(self):
         return f"{self.gender}, {self.year}, {self.treatment_status}, {self.thyroid_status}"
+    
+class Location(models.Model):
+    latnum = models.FloatField()
+    longnum = models.FloatField()
+
+    def __str__(self):
+        return f"Latitude: {self.latnum}, Longitude: {self.longnum}"

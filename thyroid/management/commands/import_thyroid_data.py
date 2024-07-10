@@ -1,5 +1,4 @@
 import csv
-import os
 from django.core.management.base import BaseCommand
 from thyroid.models import Thyroid  # Import your Thyroid model
 
