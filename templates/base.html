@@ -17,7 +17,7 @@
 
     .navbar {
       justify-content: center;
-      background-color: #343a40; /* Dark gray navbar */
+      background-color: #007bff; /* Primary color navbar */
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
@@ -35,7 +35,7 @@
       left: 0;
       z-index: 100;
       padding: 48px 0 0;
-      background-color: #495057; /* Dark gray sidebar */
+      background-color: #343a40; /* Dark gray sidebar */
       color: #ffffff; /* White text for sidebar */
       box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
     }
@@ -57,7 +57,7 @@
     }
 
     .nav-link:hover {
-      background-color: #6c757d; /* Darker gray on hover */
+      background-color: #495057; /* Darker gray on hover */
       color: #ffffff !important;
       text-decoration: none;
     }
@@ -85,6 +85,10 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
+    }
+
+    .container-fluid {
+      padding-left: 0;
     }
   </style>
 </head>
@@ -118,13 +122,19 @@
             <li class="nav-item">
               <a class="nav-link" href="/thyroid_map">Map</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/patient_data">Patient Data</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/hyper_hypo">Hyper Hypo</a>
+            </li>
           </ul>
         </div>
       </nav>
 
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom main-content">
-          <h1 class="h2">Dashboard</h1>
+          <h1 class="h2">Thyroid Disease Honours Project</h1>
         </div>
 
         <div class="block-content">

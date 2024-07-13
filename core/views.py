@@ -1,8 +1,10 @@
 from django.shortcuts import render
 import plotly.express as px
+import plotly.offline as pyo    
 from django.db.models import Count
 from thyroid.models import Thyroid
 from thyroid.models import Location
+from thyroid.models import PatientData
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -318,3 +320,132 @@ def thyroid_map_view(request):
     
     # Render the template with the Plotly map
     return render(request, 'thyroid_map.html', {'plot_div': plot_div})
+
+def plot_visualizations(request):
+    # Fetch data from the database
+    data = PatientData.objects.all().values()
+    df = pd.DataFrame(data)
+    
+    # Visualization 1: Distribution of age by gender
+    fig1 = px.histogram(df, x='age', color='sex', barmode='overlay', title='Age Distribution by Gender')
+    plot1 = pyo.plot(fig1, output_type='div')
+
+    # Visualization 2: Scatter plot of TSH vs T3 levels
+    fig2 = px.scatter(df, x='TSH', y='T3', color='sex', title='TSH vs T3 Levels')
+    plot2 = pyo.plot(fig2, output_type='div')
+
+    # Visualization 3: Bar plot of the count of different thyroid conditions
+    condition_cols = [
+        'on_thyroxine', 'query_on_thyroxine', 'on_antithyroid_meds', 'sick', 'pregnant', 
+        'thyroid_surgery', 'I131_treatment', 'query_hypothyroid', 'query_hyperthyroid', 
+        'lithium', 'goitre', 'tumor', 'hypopituitary', 'psych'
+    ]
+    condition_counts = df[condition_cols].sum().reset_index()
+    condition_counts.columns = ['condition', 'count']
+    fig3 = px.bar(condition_counts, x='condition', y='count', title='Count of Different Thyroid Conditions')
+    plot3 = pyo.plot(fig3, output_type='div')
+
+    context = {
+        'plot1': plot1,
+        'plot2': plot2,
+        'plot3': plot3
+    }
+
+    return render(request, 'patient_data.html', context)
+
+def hyper_hypo(request):
+    # Get all patient data
+    data = PatientData.objects.all().values()
+    
+    # Convert QuerySet to DataFrame
+    df = pd.DataFrame(data)
+    
+    # Visualization for query_hypothyroid
+    query_hypothyroid_counts = df['query_hypothyroid'].value_counts().reset_index()
+    query_hypothyroid_counts.columns = ['query_hypothyroid', 'count']
+    fig_hypo = px.bar(query_hypothyroid_counts, x='query_hypothyroid', y='count', 
+                      title='Count of Query Hypothyroid (0 = False, 1 = True)')
+    
+    # Visualization for query_hyperthyroid
+    query_hyperthyroid_counts = df['query_hyperthyroid'].value_counts().reset_index()
+    query_hyperthyroid_counts.columns = ['query_hyperthyroid', 'count']
+    fig_hyper = px.bar(query_hyperthyroid_counts, x='query_hyperthyroid', y='count', 
+                       title='Count of Query Hyperthyroid (0 = False, 1 = True)')
+    
+    # Convert the Plotly figures to HTML
+    fig_hypo_html = fig_hypo.to_html(full_html=False)
+    fig_hyper_html = fig_hyper.to_html(full_html=False)
+    
+    # Render the visualizations in the template
+    return render(request, 'hyper_hypo.html', 
+                  {'fig_hypo_html': fig_hypo_html, 'fig_hyper_html': fig_hyper_html})
+
+def dashboard_example(request):
+    # Bar chart data
+    years = [2005, 2006, 2015, 2016, 2019, 2020, 2021]
+    data = []
+    for year in years:
+        thyroid_year = Thyroid.objects.filter(year=year)
+        treatment_counts = thyroid_year.filter(treatment_status__isnull=False).values('treatment_status').annotate(count=Count('treatment_status'))
+        thyroid_counts = thyroid_year.values('thyroid_status').annotate(count=Count('thyroid_status'))
+        
+        for entry in treatment_counts:
+            data.append({'year': year, 'status_type': 'treatment', 'status': entry['treatment_status'], 'count': entry['count']})
+        for entry in thyroid_counts:
+            data.append({'year': year, 'status_type': 'thyroid', 'status': entry['thyroid_status'], 'count': entry['count']})
+    
+    df = pd.DataFrame(data)
+    fig_bar = px.bar(
+        df[df['status_type'] == 'thyroid'],
+        x='status',
+        y='count',
+        color='status',
+        animation_frame='year',
+        range_y=[0, df['count'].max()],
+        labels={'status': 'Thyroid Status', 'count': 'Count'},
+        title='Thyroid Status Counts by Year'
+    )
+    fig_bar.update_layout(
+        title={'text': 'Thyroid Status Counts by Year', 'y':0.9, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'},
+        xaxis_title='Thyroid Status',
+        yaxis_title='Count',
+        legend_title='Thyroid Status',
+        font=dict(family="Arial, sans-serif", size=12),
+        plot_bgcolor='rgba(0,0,0,0)',
+    )
+    fig_bar.update_traces(
+        hovertemplate='<b>Status:</b> %{x}<br><b>Count:</b> %{y}<br><b>Year:</b> %{frame}'
+    )
+    bar_chart = fig_bar.to_html(full_html=False)
+
+    # Line chart data
+    thyroid = Thyroid.objects.all()
+    df_line = pd.DataFrame(list(thyroid.values('year', 'gender', 'treatment_status', 'thyroid_status')))
+    df_filtered = df_line[(df_line['thyroid_status'] == 'yes') | (df_line['treatment_status'] == 'yes')]
+    df_grouped = df_filtered.groupby('year').agg({
+        'thyroid_status': lambda x: (x == 'yes').sum(),
+        'treatment_status': lambda x: (x == 'yes').sum()
+    }).reset_index()
+
+    fig_line = go.Figure()
+    fig_line.add_trace(go.Scatter(x=df_grouped['year'], y=df_grouped['thyroid_status'], mode='lines+markers', 
+                             name='Thyroid Disorder', line=dict(color="#33CFA5")))
+    fig_line.add_trace(go.Scatter(x=df_grouped['year'], y=df_grouped['treatment_status'], mode='lines+markers', 
+                             name='Thyroid Disorder with Treatment', line=dict(color="#F06A6A")))
+
+    fig_line.update_layout(
+        title="Thyroid Disorder Analysis",
+        xaxis_title="Year",
+        yaxis_title="Count",
+        legend=dict(x=0.01, y=0.99),
+        plot_bgcolor='rgba(0,0,0,0)',
+    )
+
+    line_chart = fig_line.to_html()
+
+    context = {
+        'bar_chart': bar_chart,
+        'line_chart': line_chart,
+    }
+
+    return render(request, 'dashboard_example.html', context)
