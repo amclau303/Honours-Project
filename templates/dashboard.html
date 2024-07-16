@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dashboard with Visualizations</title>
+		<!-- Bootstrap CSS link -->
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<!-- Optional: Additional CSS for custom styling -->
+		<style>
+			/* Add custom CSS styles here */
+			.visualization-box {
+				padding: 20px;
+				margin-bottom: 20px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+
+			/* Custom styles for specific visualizations */
+			.visualization-box-lg {
+				min-height: 500px; /* Example height for large boxes */
+			}
+
+			.visualization-box-md {
+				min-height: 300px; /* Example height for medium boxes */
+			}
+
+			.visualization-box-sm {
+				min-height: 200px; /* Example height for small boxes */
+			}
+
+			/* Center the map visualization */
+			#thyroid-map {
+				margin: 0 auto; /* Center horizontally */
+				max-width: 100%; /* Ensure map fills container width */
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container-fluid p x-5">
+			<h1 class="mt-2 mb-4">Dashboard with Visualizations</h1>
+
+			<!-- Top 3x3 Grid Layout -->
+			<div class="row">
+				<div class="col">
+					<div class="card">
+						<div class="card-body">
+                            
+                            {{bar_chart_html|safe}}
+                        
+                        </div>
+					</div>
+				</div>
+				<div class="col-md-5">
+					<div class="visualization-box visualization-box-sm">
+						<p>{{ thyroid_map_view_html|safe }}</p>
+					</div>
+				</div>
+				<div class="col">
+					<div class="visualization-box visualization-box-sm">
+						<h3>Visualization 3</h3>
+						<p>Content for Visualization 3</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12 text-center">
+					<div class="visualization-box visualization-box-lg">
+						<div id="thyroid-map">{{line_chart_html|safe}}</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Bottom Row for Remaining Visualizations -->
+			<div class="row">
+				<div class="col-md-4">
+					<div class="visualization-box visualization-box-sm">
+						<h3>Visualization 4</h3>
+						<p>Content for Visualization 4</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="visualization-box visualization-box-sm">
+						<h3>Visualization 5</h3>
+						<p>Content for Visualization 5</p>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="visualization-box visualization-box-sm">
+						<h3>Visualization 6</h3>
+						<p>Content for Visualization 6</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Bootstrap JS and dependencies (optional, if needed for specific functionality) -->
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	</body>
+</html>
