@@ -423,52 +423,17 @@ def plotly_view(request):
     # Count thyroid_surgery (boolean field)
     surgery_counts = patients.values('thyroid_surgery').annotate(count=Count('id'))
 
-    # Extracting labels and values for the pie charts
-    tumor_labels = ['Tumor', 'No Tumor']
-    tumor_values = [
-        tumor_counts.get(tumor=True)['count'] if tumor_counts.filter(tumor=True).exists() else 0,
-        tumor_counts.get(tumor=False)['count'] if tumor_counts.filter(tumor=False).exists() else 0
-    ]
+    # Convert queryset to DataFrame for Plotly Express
+    tumor_df = px.data.tips()  # Create a dummy DataFrame for the example
+    surgery_df = px.data.tips()  # Create a dummy DataFrame for the example
 
-    surgery_labels = ['Thyroid Surgery', 'No Thyroid Surgery']
-    surgery_values = [
-        surgery_counts.get(thyroid_surgery=True)['count'] if surgery_counts.filter(thyroid_surgery=True).exists() else 0,
-        surgery_counts.get(thyroid_surgery=False)['count'] if surgery_counts.filter(thyroid_surgery=False).exists() else 0
-    ]
+    # Create pie charts using Plotly Express
+    fig_tumor = px.pie(tumor_df, values=[tumor_counts.get(tumor=True)['count'], tumor_counts.get(tumor=False)['count']], names=['Tumor', 'No Tumor'], title='Tumor Distribution')
+    fig_surgery = px.pie(surgery_df, values=[surgery_counts.get(thyroid_surgery=True)['count'], surgery_counts.get(thyroid_surgery=False)['count']], names=['Thyroid Surgery', 'No Thyroid Surgery'], title='Thyroid Surgery Distribution')
 
-    # Create data for the tumor pie chart
-    fig_tumor = go.Figure(go.Pie(
-        labels=tumor_labels,
-        values=tumor_values,
-        textinfo='label+percent',
-        hole=0.3,
-        marker=dict(colors=['#9467bd', '#8c564b'])
-    ))
-
-    # Create data for the surgery pie chart
-    fig_surgery = go.Figure(go.Pie(
-        labels=surgery_labels,
-        values=surgery_values,
-        textinfo='label+percent',
-        hole=0.3,
-        marker=dict(colors=['#2ca02c', '#522568'])
-    ))
-
-    # Update layout for the tumor pie chart
-    fig_tumor.update_layout(
-        title_text='Tumor Distribution',
-        annotations=[{'text': 'Tumor', 'x': 0.5, 'y': 0.5, 'showarrow': False}]
-    )
-
-    # Update layout for the surgery pie chart
-    fig_surgery.update_layout(
-        title_text='Thyroid Surgery Distribution',
-        annotations=[{'text': 'Thyroid Surgery', 'x': 0.5, 'y': 0.5, 'showarrow': False}]
-    )
-
-    # Convert plotly figures to divs
-    div_tumor = pyo.plot(fig_tumor, output_type='div', include_plotlyjs=False)
-    div_surgery = pyo.plot(fig_surgery, output_type='div', include_plotlyjs=False)
+    # Convert Plotly figures to HTML divs
+    div_tumor = fig_tumor.to_html(full_html=False)
+    div_surgery = fig_surgery.to_html(full_html=False)
 
     # Render the template with the pie charts
     context = {
@@ -477,7 +442,6 @@ def plotly_view(request):
     }
 
     return render(request, 'plotly_view.html', context)
-
 
 def dashboard(request):
     # Fetch hyper_hypo visualizations
