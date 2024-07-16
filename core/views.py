@@ -92,13 +92,13 @@ def line_chart(request):
 
     # Add trace for 'yes' thyroid status
     fig.add_trace(go.Scatter(x=df_grouped['year'], y=df_grouped['thyroid_status'], mode='lines+markers', 
-                             name='Thyroid Disorder', line=dict(color="#33CFA5")))
+                             name='Thyroid Disease', line=dict(color="#33CFA5")))
 
     # Add trace for 'yes' treatment status
     fig.add_trace(go.Scatter(x=df_grouped['year'], y=df_grouped['treatment_status'], mode='lines+markers', 
-                             name='Thyroid Disorder with Treatment', line=dict(color="#F06A6A")))
+                             name='Thyroid Disease with Treatment', line=dict(color="#F06A6A")))
 
-    # Annotations for Thyroid Disorder trace
+    # Annotations for Thyroid Disease trace
     max_thyroid_year = df_grouped.loc[df_grouped['thyroid_status'].idxmax(), 'year']
     max_thyroid_annotation = [
         dict(
@@ -106,12 +106,12 @@ def line_chart(request):
             y=df_grouped.loc[df_grouped['year'] == max_thyroid_year, 'thyroid_status'].values[0],
             xref="x",
             yref="y",
-            text=f'Max Thyroid Disorder: {df_grouped["thyroid_status"].max()}',
+            text=f'Max Thyroid Disease: {df_grouped["thyroid_status"].max()}',
             showarrow=True, arrowhead=7, ax=50, ay=-40
         )
     ]
 
-    # Annotations for Thyroid Disorder with Treatment trace
+    # Annotations for Thyroid Disease with Treatment trace
     max_treatment_year = df_grouped.loc[df_grouped['treatment_status'].idxmax(), 'year']
     max_treatment_annotation = [
         dict(
@@ -131,7 +131,7 @@ def line_chart(request):
 
     # Update layout
     fig.update_layout(
-        title="Thyroid Disorder Analysis",
+        title="Thyroid Disease Analysis",
         xaxis_title="Year",
         yaxis_title="Count",
         legend=dict(x=0.01, y=0.99),
@@ -144,7 +144,7 @@ def line_chart(request):
                     dict(label="Reset",
                          method="update",
                          args=[{"visible": [True, True]},
-                               {"title": "Thyroid Disorder Analysis",
+                               {"title": "Thyroid Disease Analysis",
                                 "annotations": max_thyroid_annotation + max_treatment_annotation}]),
                     dict(label="Max Values",
                          method="update",
@@ -154,12 +154,12 @@ def line_chart(request):
                     dict(label="Thyroid Only",
                          method="update",
                          args=[{"visible": [True, False]},
-                               {"title": "Thyroid Disorder Analysis",
+                               {"title": "Thyroid Disease Analysis",
                                 "annotations": max_thyroid_annotation}]),
                     dict(label="Treatment Only",
                          method="update",
                          args=[{"visible": [False, True]},
-                               {"title": "Thyroid Disorder with Treatment Analysis",
+                               {"title": "Thyroid Disease with Treatment Analysis",
                                 "annotations": max_treatment_annotation}]),
                 ]),
                 showactive=True,
@@ -301,7 +301,7 @@ def stacked_bar_chart(request):
         yaxis_title='Count',
         legend=dict(x=0.01, y=0.99),
         plot_bgcolor='rgba(0,0,0,0)',
-        title='Thyroid Disorder and Treatment Status by Gender',
+        title='Thyroid Disease and Treatment Status by Gender',
         margin=dict(t=50, l=10, r=10, b=70),  # Increased bottom margin for x-axis labels
     )
 
@@ -452,6 +452,25 @@ def plotly_view(request):
 
     return render(request, 'plotly_view.html', context)
 
+def heatmap_view(request):
+    # Query data from the PatientData model
+    queryset = PatientData.objects.all()
+    
+    # Convert the queryset to a Pandas DataFrame
+    df = pd.DataFrame(list(queryset.values()))
+    
+    # Create the 2D histogram density heatmap using Plotly Express
+    fig = px.density_heatmap(df, x='T4U', y='TSH', marginal_x='histogram', marginal_y='histogram')
+    
+    # Convert the Plotly figure to HTML for embedding in the template
+    plot_div = fig.to_html(full_html=False, default_height=500, default_width=700)
+    
+    context = {
+        'plot_div': plot_div,
+    }
+    
+    return render(request, 'heatmap.html', context)
+
 def dashboard(request):
     # Fetch hyper_hypo visualizations
     hyper_hypo_html = hyper_hypo(request).content.decode('utf-8')
@@ -464,6 +483,7 @@ def dashboard(request):
     plot_visualizations_html = plot_visualizations(request).content.decode('utf-8')
     thyroid_map_view_html = thyroid_map_view(request).content.decode('utf-8')
     pie_chart_html = plotly_view(request).content.decode('utf-8')
+    heatmap_view_html = heatmap_view(request).content.decode('utf-8')
     
     # Render a combined HTML template
     combined_html = render_to_string('dashboard.html', {
@@ -475,6 +495,7 @@ def dashboard(request):
         'plot_visualizations_html': plot_visualizations_html,
         'thyroid_map_view_html': thyroid_map_view_html,
         'pie_chart_html' : pie_chart_html,
+        'heatmap_view_html': heatmap_view_html,
     })
     
     return HttpResponse(combined_html)

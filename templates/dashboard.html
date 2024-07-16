@@ -23,14 +23,6 @@
         .navbar-nav .nav-link {
             color: #ffffff; /* White text */
         }
-        .visualization-box {
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #ffffff; /* White background */
-            border: 1px solid #ced4da; /* Light gray border */
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
         .card-header {
             background-color: #007bff; /* Dark blue */
             color: #ffffff; /* White text */
@@ -80,8 +72,8 @@
             </div>
             <div class="col-lg-4 col-md-12 mb-4">
                 <div class="card">
-                    <div class="card-header">Scatter Plot - <a href="/">Open in new tab</a></div>
-                    <div class="card-body"></div>
+                    <div class="card-header">T4U/TSH Amounts Heatmap [Kaggle Data]<a href="/heatmap">Open in new tab</a></div>
+                    <div class="card-body">{{heatmap_view_html|safe}}</div>
                 </div>
             </div>
         </div>
@@ -112,7 +104,7 @@
         <!-- Bottom Row for Remaining Visualizations -->
         <div class="row">
             <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card visualization-box">
+                <div class="card">
                     <div class="card-header">TSH/T3 and Conditions [Kaggle Data]<a href="/patient_data">Open in New Tab</a></div>
                     <div class="card-body">
                         <p>{{plot_visualizations_html|safe}}</p>
@@ -120,7 +112,7 @@
                 </div>
             </div>
             <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card visualization-box">
+                <div class="card">
                     <div class="card-header">Hypothyroid vs Hyperthyroid Counts [Kaggle Data]<a href="/hyper_hypo">Open in New Tab</a></div>
                     <div class="card-body">
                         <p>{{ hyper_hypo_html|safe }}</p>
@@ -128,7 +120,7 @@
                 </div>
             </div>
             <div class="col-lg-4 col-md-12 mb-4">		
-                <div class="card visualization-box">
+                <div class="card">
                     <div class="card-header">Surgery/Tumour Counts [Kaggle Data]<a href="/plotly_view">Open in New Tab</a></div>
                     <div class="card-body">
                         <p>{{pie_chart_html|safe}}</p>

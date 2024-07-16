@@ -29,5 +29,6 @@ urlpatterns = [
     path('patient_data', views.plot_visualizations, name='patient_data'),
     path('hyper_hypo', views.hyper_hypo, name='hyper_hypo'),
     path('dashboard', views.dashboard, name='dashboard'),
-    path('plotly_view', views.plotly_view, name='plotly_view')
+    path('plotly_view', views.plotly_view, name='plotly_view'),
+    path('heatmap', views.heatmap_view, name='histogram')
 ]
