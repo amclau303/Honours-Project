@@ -299,7 +299,7 @@ def thyroid_map_view(request):
         df, lat='Latitude', lon='Longitude', radius=10,
         mapbox_style='open-street-map',
         title='Thyroid Locations Heatmap',
-        height=800,  # Increase the height of the map
+        height=1000,  # Increase the height of the map
         color_continuous_scale="Viridis"  # Adjust color scale to be less intense
     )
     
