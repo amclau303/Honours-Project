@@ -351,10 +351,6 @@ def plot_visualizations(request):
     # Fetch data from the database
     data = PatientData.objects.all().values()
     df = pd.DataFrame(data)
-    
-    # Visualization 1: Distribution of age by gender
-    fig1 = px.histogram(df, x='age', color='sex', barmode='overlay', title='Age Distribution by Gender')
-    plot1 = pyo.plot(fig1, output_type='div')
 
     # Visualization 2: Scatter plot of TSH vs T3 levels
     fig2 = px.scatter(df, x='TSH', y='T3', color='sex', title='TSH vs T3 Levels')
@@ -372,7 +368,6 @@ def plot_visualizations(request):
     plot3 = pyo.plot(fig3, output_type='div')
 
     context = {
-        'plot1': plot1,
         'plot2': plot2,
         'plot3': plot3
     }
@@ -390,7 +385,6 @@ def hyper_hypo(request):
     query_hypothyroid_counts = df['query_hypothyroid'].value_counts().reset_index()
     query_hypothyroid_counts.columns = ['query_hypothyroid', 'count']
     fig_hypo = px.bar(query_hypothyroid_counts, x='query_hypothyroid', y='count', 
-                      title='Count of Query Hypothyroid (0 = False, 1 = True)',
                       labels={'query_hypothyroid': 'Hypothyroid False vs. True', 'count': 'Count'},
                       color='query_hypothyroid',
                       color_discrete_map={0: 'lightblue', 1: 'darkblue'},
@@ -401,7 +395,6 @@ def hyper_hypo(request):
     query_hyperthyroid_counts = df['query_hyperthyroid'].value_counts().reset_index()
     query_hyperthyroid_counts.columns = ['query_hyperthyroid', 'count']
     fig_hyper = px.bar(query_hyperthyroid_counts, x='query_hyperthyroid', y='count', 
-                       title='Count of Query Hyperthyroid (0 = False, 1 = True)',
                        labels={'query_hyperthyroid': 'Hyperthyroid False vs. True', 'count': 'Count'},
                        color='query_hyperthyroid',
                        color_discrete_map={0: 'lightcoral', 1: 'darkred'},
@@ -412,10 +405,84 @@ def hyper_hypo(request):
     fig_hypo_html = fig_hypo.to_html(full_html=False)
     fig_hyper_html = fig_hyper.to_html(full_html=False)
     
-    return fig_hypo_html, fig_hyper_html
+    # Pass the HTML of the Plotly figures to the template
+    context = {
+        'fig_hypo_html': fig_hypo_html,
+        'fig_hyper_html': fig_hyper_html
+    }
+    
+    return render(request, 'hyper_hypo.html', context)
+
+def plotly_view(request):
+    # Querying data from PatientData model
+    patients = PatientData.objects.all()
+
+    # Count tumor (boolean field)
+    tumor_counts = patients.values('tumor').annotate(count=Count('id'))
+
+    # Count thyroid_surgery (boolean field)
+    surgery_counts = patients.values('thyroid_surgery').annotate(count=Count('id'))
+
+    # Extracting labels and values for the pie charts
+    tumor_labels = ['Tumor', 'No Tumor']
+    tumor_values = [
+        tumor_counts.get(tumor=True)['count'] if tumor_counts.filter(tumor=True).exists() else 0,
+        tumor_counts.get(tumor=False)['count'] if tumor_counts.filter(tumor=False).exists() else 0
+    ]
+
+    surgery_labels = ['Thyroid Surgery', 'No Thyroid Surgery']
+    surgery_values = [
+        surgery_counts.get(thyroid_surgery=True)['count'] if surgery_counts.filter(thyroid_surgery=True).exists() else 0,
+        surgery_counts.get(thyroid_surgery=False)['count'] if surgery_counts.filter(thyroid_surgery=False).exists() else 0
+    ]
+
+    # Create data for the tumor pie chart
+    fig_tumor = go.Figure(go.Pie(
+        labels=tumor_labels,
+        values=tumor_values,
+        textinfo='label+percent',
+        hole=0.3,
+        marker=dict(colors=['#9467bd', '#8c564b'])
+    ))
+
+    # Create data for the surgery pie chart
+    fig_surgery = go.Figure(go.Pie(
+        labels=surgery_labels,
+        values=surgery_values,
+        textinfo='label+percent',
+        hole=0.3,
+        marker=dict(colors=['#2ca02c', '#522568'])
+    ))
+
+    # Update layout for the tumor pie chart
+    fig_tumor.update_layout(
+        title_text='Tumor Distribution',
+        annotations=[{'text': 'Tumor', 'x': 0.5, 'y': 0.5, 'showarrow': False}]
+    )
+
+    # Update layout for the surgery pie chart
+    fig_surgery.update_layout(
+        title_text='Thyroid Surgery Distribution',
+        annotations=[{'text': 'Thyroid Surgery', 'x': 0.5, 'y': 0.5, 'showarrow': False}]
+    )
+
+    # Convert plotly figures to divs
+    div_tumor = pyo.plot(fig_tumor, output_type='div', include_plotlyjs=False)
+    div_surgery = pyo.plot(fig_surgery, output_type='div', include_plotlyjs=False)
+
+    # Render the template with the pie charts
+    context = {
+        'div_tumor': div_tumor,
+        'div_surgery': div_surgery,
+    }
+
+    return render(request, 'plotly_view.html', context)
 
 
 def dashboard(request):
+    # Fetch hyper_hypo visualizations
+    hyper_hypo_html = hyper_hypo(request).content.decode('utf-8')
+    
     # Render individual views and collect HTML outputs
     bar_chart_html = bar_chart(request).content.decode('utf-8')
     line_chart_html = line_chart(request).content.decode('utf-8')
@@ -424,19 +491,16 @@ def dashboard(request):
     plot_visualizations_html = plot_visualizations(request).content.decode('utf-8')
     thyroid_map_view_html = thyroid_map_view(request).content.decode('utf-8')
     
-    # Fetch hyper_hypo visualizations
-    fig_hypo_html, fig_hyper_html = hyper_hypo(request)
-    
     # Render a combined HTML template
     combined_html = render_to_string('dashboard.html', {
+        'hyper_hypo_html': hyper_hypo_html,
         'bar_chart_html': bar_chart_html,
         'line_chart_html': line_chart_html,
         'scatter_plot_html': scatter_plot_html,
         'stacked_bar_chart_html': stacked_bar_chart_html,
         'plot_visualizations_html': plot_visualizations_html,
         'thyroid_map_view_html': thyroid_map_view_html,
-        'fig_hypo_html': fig_hypo_html,
-        'fig_hyper_html': fig_hyper_html,
     })
     
     return HttpResponse(combined_html)
+
