@@ -174,45 +174,77 @@ def line_chart(request):
     return render(request, 'line_chart.html', context)
 
 def scatter_plot(request):
-    thyroid = Thyroid.objects.all()
+    # Query all PatientData objects
+    patient_data = PatientData.objects.all()
 
     # Convert to DataFrame
-    df = pd.DataFrame(thyroid.values())
+    df = pd.DataFrame(list(patient_data.values()))
 
-    # Filter for 'yes' thyroid_status
-    df_filtered = df[df['thyroid_status'] == 'yes']
+    # Filter out ages greater than 100
+    df = df[df['age'] <= 100]
 
-    # Group by year and gender and count occurrences
-    df_grouped = df_filtered.groupby(['year', 'gender']).size().reset_index(name='count')
+    # Calculate counts of ages for each gender
+    counts_male = df[df['sex'] == 'M'].groupby('age').size().reset_index(name='count')
+    counts_female = df[df['sex'] == 'F'].groupby('age').size().reset_index(name='count')
 
-    # Separate the data for male and female
-    df_male = df_grouped[df_grouped['gender'] == 'male']
-    df_female = df_grouped[df_grouped['gender'] == 'female']
-
-    # Create scatter plot
+    # Create initial scatter plot
     fig = go.Figure()
 
+    # Scatter plot for males
     fig.add_trace(go.Scatter(
-        x=df_male['year'], 
-        y=df_male['count'],
+        x=counts_male['age'], 
+        y=counts_male['count'],
         mode='markers',
         name='Male',
-        marker=dict(color='blue')
+        marker=dict(color='blue', symbol='square'),
+        visible=True  # Initially visible
     ))
 
+    # Scatter plot for females
     fig.add_trace(go.Scatter(
-        x=df_female['year'], 
-        y=df_female['count'],
+        x=counts_female['age'], 
+        y=counts_female['count'],
         mode='markers',
         name='Female',
-        marker=dict(color='pink')
+        marker=dict(color='red', symbol='circle'),
+        visible=False  # Initially hidden
     ))
 
+    # Update layout
     fig.update_layout(
-        title="Scatter Plot of Thyroid Status 'Yes' by Gender",
-        xaxis_title="Year",
+        title="Age Distribution by Gender",
+        xaxis_title="Age",
         yaxis_title="Count",
-        template='plotly_white'
+        template='plotly_white',
+        legend_title="Gender",
+        font=dict(family="Arial", size=12),
+        title_font_size=24,
+        showlegend=True,
+        legend=dict(x=0.85, y=0.95),
+        margin=dict(l=50, r=50, t=80, b=50),
+        hovermode='closest',
+    )
+
+    # Add button to toggle between genders
+    fig.update_layout(
+        updatemenus=[
+            {
+                'buttons': [
+                    {
+                        'label': 'Male',
+                        'method': 'update',
+                        'args': [{'visible': [True, False]}, {'title': 'Age Distribution for Males With Thyroid Disease'}]
+                    },
+                    {
+                        'label': 'Female',
+                        'method': 'update',
+                        'args': [{'visible': [False, True]}, {'title': 'Age Distribution for Females With Thyroid Disease'}]
+                    }
+                ],
+                'direction': 'down',
+                'showactive': True,
+            }
+        ]
     )
 
     scatter_plot_html = fig.to_html(full_html=False)
@@ -299,7 +331,7 @@ def thyroid_map_view(request):
         df, lat='Latitude', lon='Longitude', radius=10,
         mapbox_style='open-street-map',
         title='Thyroid Locations Heatmap',
-        height=1000,  # Increase the height of the map
+        height=975,  # Increase the height of the map
         color_continuous_scale="Viridis"  # Adjust color scale to be less intense
     )
     
