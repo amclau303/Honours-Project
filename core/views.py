@@ -463,7 +463,7 @@ def heatmap_view(request):
     fig = px.density_heatmap(df, x='T4U', y='TSH', marginal_x='histogram', marginal_y='histogram')
     
     # Convert the Plotly figure to HTML for embedding in the template
-    plot_div = fig.to_html(full_html=False, default_height=500, default_width=700)
+    plot_div = fig.to_html(full_html=False)
     
     context = {
         'plot_div': plot_div,
