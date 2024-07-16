@@ -20,30 +20,12 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font family */
             line-height: 1.6; /* Line height for readability */
             position: relative; /* Set position relative for absolute positioning */
-        }
-        .animated-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Push behind other content */
-            opacity: 0.6; /* Adjust opacity for better visibility */
             background-image: url('https://www.transparenttextures.com/patterns/gray-jean.png'); /* Background pattern image */
-            pointer-events: none; /* Ensure background doesn't interfere with clicks */
-            animation: animateBackground 20s linear infinite;
-        }
-        @keyframes animateBackground {
-            0% {
-                transform: translateY(0);
-            }
-            100% {
-                transform: translateY(-100%);
-            }
+            background-size: cover; /* Cover the entire background */
+            background-repeat: repeat; /* Repeat the pattern */
         }
         .navbar {
             background-color: #007bff; /* Dark blue */
-            z-index: 2; /* Ensure navbar appears above animated background */
             border-bottom: 2px solid #0056b3; /* Darker border at the bottom */
         }
         .navbar-brand {
@@ -63,6 +45,32 @@
         .container {
             margin-top: 20px; /* Space below navbar */
         }
+
+		@keyframes scrollBg {
+			from {
+			  transform: translateY(0px);
+			}
+			to {
+			  transform: translateY(-330px);
+			}
+		  }
+		  
+		  .scroll-bg {
+			height: 100%;
+			width: 100%;
+			filter: blur(10px);
+			position: fixed;
+			padding-bottom: 330px;
+			background-color: #E8BA9B;
+			background-image: url('https://miro.medium.com/v2/resize:fit:924/1*suY3Y7kIAV_7xKox9AL3fw.png');
+			background-size: cover;
+			animation: scrollBg 35s linear forwards;
+		  }
+		  
+		  .card {
+			position: relative;
+			z-index: 1; /* Ensure card appears above background */
+		  }
     </style>
 </head>
 <body>
@@ -74,18 +82,15 @@
         </button>
     </nav>
 
-    <!-- Animated background -->
-    <div class="animated-background"></div>
-
-    <!-- Main content area -->
-    <div class="container mt-4"> <!-- Adjusted margin top -->
+		
+    <div class="container mt-4 context"> <!-- Adjusted margin top -->
         <div class="row justify-content-center"> <!-- Center content horizontally -->
             <div class="col-md-8"> <!-- Adjusted column width -->
                 <div class="card">
                     <div class="card-body">
                         <h2>About the Project</h2>
                         <p>
-                            Insert your project description here. You can talk about the purpose, goals, methodology, and any key findings related to thyroid disease.
+                            ThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroidThyroid
                         </p>
                         <a href="dashboard" class="btn btn-primary btn-lg btn-block">Go to Dashboard</a>
                     </div>
@@ -93,6 +98,8 @@
             </div>
         </div>
     </div>
+
+    <div class="scroll-bg"></div>
 
     <!-- Bootstrap JS and dependencies (optional) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
