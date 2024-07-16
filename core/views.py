@@ -380,31 +380,40 @@ def plot_visualizations(request):
     return render(request, 'patient_data.html', context)
 
 def hyper_hypo(request):
-    # Get all patient data
-    data = PatientData.objects.all().values()
+    # Fetch all patient data from the database
+    patient_data = PatientData.objects.all().values()
     
     # Convert QuerySet to DataFrame
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(patient_data)
     
-    # Visualization for query_hypothyroid
+    # Create visualization for query_hypothyroid
     query_hypothyroid_counts = df['query_hypothyroid'].value_counts().reset_index()
     query_hypothyroid_counts.columns = ['query_hypothyroid', 'count']
     fig_hypo = px.bar(query_hypothyroid_counts, x='query_hypothyroid', y='count', 
-                      title='Count of Query Hypothyroid (0 = False, 1 = True)')
+                      title='Count of Query Hypothyroid (0 = False, 1 = True)',
+                      labels={'query_hypothyroid': 'Hypothyroid False vs. True', 'count': 'Count'},
+                      color='query_hypothyroid',
+                      color_discrete_map={0: 'lightblue', 1: 'darkblue'},
+                      template='plotly_white')
+    fig_hypo.update_layout(showlegend=False)  # Hide legend for cleaner look
     
-    # Visualization for query_hyperthyroid
+    # Create visualization for query_hyperthyroid
     query_hyperthyroid_counts = df['query_hyperthyroid'].value_counts().reset_index()
     query_hyperthyroid_counts.columns = ['query_hyperthyroid', 'count']
     fig_hyper = px.bar(query_hyperthyroid_counts, x='query_hyperthyroid', y='count', 
-                       title='Count of Query Hyperthyroid (0 = False, 1 = True)')
+                       title='Count of Query Hyperthyroid (0 = False, 1 = True)',
+                       labels={'query_hyperthyroid': 'Hyperthyroid False vs. True', 'count': 'Count'},
+                       color='query_hyperthyroid',
+                       color_discrete_map={0: 'lightcoral', 1: 'darkred'},
+                       template='plotly_white')
+    fig_hyper.update_layout(showlegend=False)  # Hide legend for cleaner look
     
     # Convert the Plotly figures to HTML
     fig_hypo_html = fig_hypo.to_html(full_html=False)
     fig_hyper_html = fig_hyper.to_html(full_html=False)
     
-    # Render the visualizations in the template
-    return render(request, 'hyper_hypo.html', 
-                  {'fig_hypo_html': fig_hypo_html, 'fig_hyper_html': fig_hyper_html})
+    return fig_hypo_html, fig_hyper_html
+
 
 def dashboard(request):
     # Render individual views and collect HTML outputs
@@ -414,7 +423,10 @@ def dashboard(request):
     stacked_bar_chart_html = stacked_bar_chart(request).content.decode('utf-8')
     plot_visualizations_html = plot_visualizations(request).content.decode('utf-8')
     thyroid_map_view_html = thyroid_map_view(request).content.decode('utf-8')
-
+    
+    # Fetch hyper_hypo visualizations
+    fig_hypo_html, fig_hyper_html = hyper_hypo(request)
+    
     # Render a combined HTML template
     combined_html = render_to_string('dashboard.html', {
         'bar_chart_html': bar_chart_html,
@@ -423,6 +435,8 @@ def dashboard(request):
         'stacked_bar_chart_html': stacked_bar_chart_html,
         'plot_visualizations_html': plot_visualizations_html,
         'thyroid_map_view_html': thyroid_map_view_html,
+        'fig_hypo_html': fig_hypo_html,
+        'fig_hyper_html': fig_hyper_html,
     })
     
     return HttpResponse(combined_html)
