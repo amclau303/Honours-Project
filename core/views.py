@@ -463,6 +463,7 @@ def dashboard(request):
     stacked_bar_chart_html = stacked_bar_chart(request).content.decode('utf-8')
     plot_visualizations_html = plot_visualizations(request).content.decode('utf-8')
     thyroid_map_view_html = thyroid_map_view(request).content.decode('utf-8')
+    pie_chart_html = plotly_view(request).content.decode('utf-8')
     
     # Render a combined HTML template
     combined_html = render_to_string('dashboard.html', {
@@ -473,6 +474,7 @@ def dashboard(request):
         'stacked_bar_chart_html': stacked_bar_chart_html,
         'plot_visualizations_html': plot_visualizations_html,
         'thyroid_map_view_html': thyroid_map_view_html,
+        'pie_chart_html' : pie_chart_html,
     })
     
     return HttpResponse(combined_html)

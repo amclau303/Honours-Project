@@ -1,25 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Plotly View</title>
-    <!-- Include Plotly.js -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-</head>
-<body>
-    <h1 style="text-align: center;">Patient Data Distribution</h1>
+<h2>Tumor Counts</h2>
+<div>{{ div_tumor|safe }}</div>
 
-    <div style="display: flex; justify-content: space-around;">
-        <!-- Display the tumor pie chart -->
-        <div id="tumor-chart" style="width: 45%;">
-            {{ div_tumor | safe }}
-        </div>
-
-        <!-- Display the surgery pie chart -->
-        <div id="surgery-chart" style="width: 45%;">
-            {{ div_surgery | safe }}
-        </div>
-    </div>
-
-</body>
-</html>
+<h2>Surgery Counts</h2>
+<div>{{ div_surgery|safe }}</div>
