@@ -427,9 +427,18 @@ def plotly_view(request):
     tumor_df = px.data.tips()  # Create a dummy DataFrame for the example
     surgery_df = px.data.tips()  # Create a dummy DataFrame for the example
 
-    # Create pie charts using Plotly Express
-    fig_tumor = px.pie(tumor_df, values=[tumor_counts.get(tumor=True)['count'], tumor_counts.get(tumor=False)['count']], names=['Tumor', 'No Tumor'], title='Tumor Distribution')
-    fig_surgery = px.pie(surgery_df, values=[surgery_counts.get(thyroid_surgery=True)['count'], surgery_counts.get(thyroid_surgery=False)['count']], names=['Thyroid Surgery', 'No Thyroid Surgery'], title='Thyroid Surgery Distribution')
+    # Create pie charts using Plotly Express with medical-like colors
+    fig_tumor = px.pie(tumor_df, 
+                       values=[tumor_counts.get(tumor=True)['count'], tumor_counts.get(tumor=False)['count']], 
+                       names=['Tumor', 'No Tumor'], 
+                       title='Tumor Distribution',
+                       color_discrete_sequence=['#1f77b4', '#ff7f0e'])
+
+    fig_surgery = px.pie(surgery_df, 
+                         values=[surgery_counts.get(thyroid_surgery=True)['count'], surgery_counts.get(thyroid_surgery=False)['count']], 
+                         names=['Thyroid Surgery', 'No Thyroid Surgery'], 
+                         title='Thyroid Surgery Distribution',
+                         color_discrete_sequence=['#2ca02c', '#d62728'])
 
     # Convert Plotly figures to HTML divs
     div_tumor = fig_tumor.to_html(full_html=False)
