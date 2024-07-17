@@ -1,158 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard with Visualizations</title>
-    <!-- Bootstrap CSS link -->
-    <link
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-        rel="stylesheet"
-    />
-    <!-- Optional: Additional CSS for custom styling -->
-    <style>
-        /* Custom CSS */
-        body {
-            background-color: #f8f9fa; /* Light gray background */
-            overflow-x: hidden; /* Hide horizontal overflow */
-            color: #495057; /* Dark text */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font family */
-            line-height: 1.6; /* Line height for readability */
-            position: relative; /* Set position relative for absolute positioning */
-        }
-        .navbar {
-            background-color: #007bff; /* Dark blue */
-            z-index: 2; /* Ensure navbar appears above animated background */
-            border-bottom: 2px solid #0056b3; /* Darker border at the bottom */
-        }
-        .navbar-brand {
-            color: #ffffff !important; /* White text */
-            font-size: 1.5rem; /* Larger font size for brand */
-            font-weight: bold; /* Bold font weight */
-        }
-        .navbar-nav .nav-link {
-            color: #ffffff !important; /* White text */
-            font-size: 1.2rem; /* Larger font size for links */
-            font-weight: bold; /* Bold font weight */
-            margin-left: 20px; /* Space between links */
-        }
-        .navbar-nav .nav-link:hover {
-            text-decoration: underline; /* Underline on hover */
-        }
-        .card-header {
-            background-color: #007bff; /* Dark blue */
-            color: #ffffff; /* White text */
-            display: flex; /* Use flexbox for inline elements */
-            justify-content: space-between; /* Space between header and link */
-            align-items: center; /* Center align items */
-            padding: 10px 15px; /* Padding inside the header */
-        }
-        .card-header a {
-            color: #ffffff; /* White text */
-            text-decoration: none; /* Remove underline */
-            font-weight: bold; /* Make the link text bold */
-        }
-        .card-body {
-            padding: 15px;
-        }
-        h1,
-        h2,
-        h3 {
-            color: #007bff; /* Dark blue */
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand mx-auto" href="/"> Thyroid Data Visualization </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </nav>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dashboard with Visualizations</title>
+		<!-- Bootstrap CSS link -->
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<!-- Optional: Additional CSS for custom styling -->
+		<style>
+			/* Custom CSS */
+			body {
+				background-color: #f8f9fa; /* Light gray background */
+				overflow-x: hidden; /* Hide horizontal overflow */
+				color: #495057; /* Dark text */
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Font family */
+				line-height: 1.6; /* Line height for readability */
+				position: relative; /* Set position relative for absolute positioning */
+			}
+			.navbar {
+				background-color: #007bff; /* Dark blue */
+				border-bottom: 2px solid #0056b3; /* Darker border at the bottom */
+			}
+			.navbar-brand {
+				color: #ffffff !important; /* White text */
+				font-size: 1.5rem; /* Larger font size for brand */
+				font-weight: bold; /* Bold font weight */
+			}
+			.navbar-nav .nav-link {
+				color: #ffffff !important; /* White text */
+				font-size: 1.2rem; /* Larger font size for links */
+				font-weight: bold; /* Bold font weight */
+				margin-left: 20px; /* Space between links */
+			}
+			.navbar-nav .nav-link {
+				color: #ffffff !important; /* White text */
+				font-size: 1.2rem; /* Larger font size for links */
+				font-weight: bold; /* Bold font weight */
+				margin-left: 20px; /* Space between links */
+			}
+			.card-header {
+				background-color: #007bff; /* Dark blue */
+				color: #ffffff; /* White text */
+				display: flex; /* Use flexbox for inline elements */
+				justify-content: space-between; /* Space between header and link */
+				align-items: center; /* Center align items */
+				padding: 10px 15px; /* Padding inside the header */
+			}
+			.card-header a {
+				color: #ffffff; /* White text */
+				text-decoration: none; /* Remove underline */
+				font-weight: bold; /* Make the link text bold */
+			}
+			.card-body {
+				padding: 15px;
+			}
+			h1,
+			h2,
+			h3 {
+				color: #007bff; /* Dark blue */
+			}
+		</style>
+	</head>
+	<body>
+		<!-- Navbar -->
+		<nav class="navbar navbar-expand-lg navbar-dark">
+			<a class="navbar-brand mx-auto" href="/"> Thyroid Data Visualization </a>
+			<button
+				class="navbar-toggler"
+				type="button"
+				data-toggle="collapse"
+				data-target="#navbarNav"
+				aria-controls="navbarNav"
+				aria-expanded="false"
+				aria-label="Toggle navigation"
+			>
+				<span class="navbar-toggler-icon"></span>
+			</button>
+		</nav>
 
-    <!-- Main Content -->
-    <div class="container-fluid px-5">
-        <h1 class="mt-4 mb-5 text-center">Dashboard with Visualizations</h1>
+		<!-- Main Content -->
+		<div class="container-fluid px-5">
+			<h1 class="mt-4 mb-5 text-center">Dashboard with Visualizations</h1>
 
-        <!-- Top 3x3 Grid Layout -->
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">Thyroid Status Counts by Year [DHS Data] <a href="/bar_chart">Open in new tab</a></div>
-                    <div class="card-body">{{bar_chart_html|safe}}</div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">Thyroid Disease Status/Treatment by Gender [DHS Data]<a href="/stacked_bar_chart">Open in new tab</a></div>
-                    <div class="card-body">{{stacked_bar_chart_html|safe}}</div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-12 mb-4">
-                <div class="card">
-                    <div class="card-header">T4U/TSH Amounts 2D Histogram [Kaggle Data]<a href="/heatmap">Open in new tab</a></div>
-                    <div class="card-body">{{heatmap_view_html|safe}}</div>
-                </div>
-            </div>
-        </div>
+			<!-- Top 3x3 Grid Layout -->
+			<div class="row">
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div class="card">
+						<div class="card-header">
+							Thyroid Status Counts by Year [DHS Data]
+							<a href="/bar_chart">Open in new tab</a>
+						</div>
+						<div class="card-body">{{bar_chart_html|safe}}</div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div class="card">
+						<div class="card-header">
+							Thyroid Disease Status/Treatment by Gender [DHS Data]<a
+								href="/stacked_bar_chart"
+								>Open in new tab</a
+							>
+						</div>
+						<div class="card-body">{{stacked_bar_chart_html|safe}}</div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-12 mb-4">
+					<div class="card">
+						<div class="card-header">
+							T4U/TSH Amounts 2D Histogram [Kaggle Data]<a href="/heatmap"
+								>Open in new tab</a
+							>
+						</div>
+						<div class="card-body">{{heatmap_view_html|safe}}</div>
+					</div>
+				</div>
+			</div>
 
-        <div class="row">
-            <div class="col-lg-8 col-md-12 mb-4">
-                <div class="card">
-                    <div class="card-header">Thyroid Disease Status/Treatment by Year [DHS Data]<a href="/line_chart">Open in new tab</a></div>
-                    <div class="card-body">
-                        <div id="thyroid-map">{{line_chart_html|safe}}</div>
-                    </div>
-                </div>
-                <div class="card mt-4">
-                    <div class="card-header">Thyroid Disease Age Distributions [Kaggle Data]<a href="/scatter_plot">Open in new tab</a></div>
-                    <div class="card-body">{{scatter_plot_html|safe}}</div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">Thyroid Disease Locational View [DHS Data]<a href="/thyroid_map">Open in New Tab</a></div>
-                    <div class="card-body">
-                        <p>{{ thyroid_map_view_html|safe }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+			<div class="row">
+				<div class="col-lg-8 col-md-12 mb-4">
+					<div class="card">
+						<div class="card-header">
+							Thyroid Disease Status/Treatment by Year [DHS Data]<a
+								href="/line_chart"
+								>Open in new tab</a
+							>
+						</div>
+						<div class="card-body">
+							<div id="thyroid-map">{{line_chart_html|safe}}</div>
+						</div>
+					</div>
+					<div class="card mt-4">
+						<div class="card-header">
+							Thyroid Disease Age Distributions [Kaggle Data]<a
+								href="/scatter_plot"
+								>Open in new tab</a
+							>
+						</div>
+						<div class="card-body">{{scatter_plot_html|safe}}</div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div class="card">
+						<div class="card-header">
+							Thyroid Disease Locational View [DHS Data]<a href="/thyroid_map"
+								>Open in New Tab</a
+							>
+						</div>
+						<div class="card-body">
+							<p>{{ thyroid_map_view_html|safe }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
 
-        <!-- Bottom Row for Remaining Visualizations -->
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">TSH/T3 and Conditions [Kaggle Data]<a href="/patient_data">Open in New Tab</a></div>
-                    <div class="card-body">
-                        <p>{{plot_visualizations_html|safe}}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">Hypothyroid vs Hyperthyroid Counts [Kaggle Data]<a href="/hyper_hypo">Open in New Tab</a></div>
-                    <div class="card-body">
-                        <p>{{ hyper_hypo_html|safe }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-12 mb-4">		
-                <div class="card">
-                    <div class="card-header">Surgery/Tumour Counts [Kaggle Data]<a href="/plotly_view">Open in New Tab</a></div>
-                    <div class="card-body">
-                        <p>{{pie_chart_html|safe}}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+			<!-- Bottom Row for Remaining Visualizations -->
+			<div class="row">
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div class="card">
+						<div class="card-header">
+							TSH/T3 and Conditions [Kaggle Data]<a href="/patient_data"
+								>Open in New Tab</a
+							>
+						</div>
+						<div class="card-body">
+							<p>{{plot_visualizations_html|safe}}</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-6 mb-4">
+					<div class="card">
+						<div class="card-header">
+							Hypothyroid vs Hyperthyroid Counts [Kaggle Data]<a
+								href="/hyper_hypo"
+								>Open in New Tab</a
+							>
+						</div>
+						<div class="card-body">
+							<p>{{ hyper_hypo_html|safe }}</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-12 mb-4">
+					<div class="card">
+						<div class="card-header">
+							Surgery/Tumour Counts [Kaggle Data]<a href="/plotly_view"
+								>Open in New Tab</a
+							>
+						</div>
+						<div class="card-body">
+							<p>{{pie_chart_html|safe}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <!-- Bootstrap JS and dependencies (optional, if needed for specific functionality) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+		<!-- Bootstrap JS and dependencies (optional, if needed for specific functionality) -->
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	</body>
 </html>
