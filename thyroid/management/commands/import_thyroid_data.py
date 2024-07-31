@@ -1,6 +1,6 @@
 import csv
 from django.core.management.base import BaseCommand
-from thyroid.models import Thyroid  # Import your Thyroid model
+from thyroid.models import Thyroid
 
 class Command(BaseCommand):
     help = 'Imports data from ThyroidData.csv into the Thyroid model'
