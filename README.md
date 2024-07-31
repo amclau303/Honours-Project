@@ -42,9 +42,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 pip install -r requirements.txt
 ```
 
-7. Navigate to the directory "backend"
-
-8. If it is the first time running this project inside the virtual environment use the following commands:
+7. If it is the first time running this project inside the virtual environment use the following commands:
 
 ```
 py manage.py makemigrations
@@ -53,13 +51,13 @@ py manage.py makemigrations
 py manage.py migrate
 ```
 
-9. To run the application, use the following command:
+8. To run the application, use the following command:
 
 ```
 py manage.py runserver
 ```
 
-10. To view the website, the link will be provided in the command prompt via Django
+9. To view the website, the link will be provided in the command prompt via Django
 
 
 If a new library has been added to the project, while using an active virtual environment, use the following command to update your requirements.txt file, and push it to the repo:
