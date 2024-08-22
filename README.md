@@ -9,7 +9,7 @@ git clone https://github.com/amclau303/Honours-Project
 
 2. Have most up to date version of Python installed
 
-3. Navigate to the library named "django-react-app", Open a terminal and use the command:
+3. Navigate to the library. Open a terminal and use the command:
 
 ```
 pip install virtualenv
